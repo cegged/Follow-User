@@ -41,21 +41,21 @@ To stop, right-click them again and click **Unfollow User**. You can follow one 
 
 The user you follow now appears at the top of your server list.
 
-<img src="images/indicator.png" alt="Follow indicator in the server list" width="64">
+<img src="images/indicator.png" alt="Follow indicator in the server list" width="66">
 
 | You see | It means |
 |---|---|
 | Green badge | They are in a voice channel and you are following them |
-| Grey badge | They are not in a voice channel you can see |
-| Faded picture | Following is paused |
+| Dark badge | They are not in a voice channel you can see |
+| Faded picture, ❚❚ on the badge | Following is paused |
 
 **Hover** it to see which channel they are in. **Click** it to join them right now.
 
-### 3. Pause or stop
+### 3. Open the panel
 
-Right-click the indicator:
+Right-click the indicator to open its panel. At the top you see who you follow and which channel they are in.
 
-<img src="images/indicator-menu.png" alt="Indicator menu" width="156">
+<img src="images/indicator-menu.png" alt="Indicator panel with the transparency slider open" width="285">
 
 | Option | What it does |
 |---|---|
@@ -63,10 +63,13 @@ Right-click the indicator:
 | **Pause / Resume Following** | Stops following for a while, without forgetting the user |
 | **Unfollow** | Stops following and removes the indicator |
 | **Settings** | Opens the plugin settings |
+| **◐** at the top right | Opens a slider that sets how see-through the panel is. **Reset** returns it to 65% |
+
+Press **Esc** or click outside the panel to close it.
 
 ## Settings
 
-Open them from the indicator menu, or from **Vencord → Plugins → Follow User**.
+Open them from the indicator's panel, or from **Vencord → Plugins → Follow User**.
 
 | Setting | Default | What it does |
 |---|:---:|---|
@@ -76,8 +79,9 @@ Open them from the indicator menu, or from **Vencord → Plugins → Follow User
 | **Auto Move Back** | Off | Go back to them when someone moves you |
 | **Channel Full** | On | Join their channel when a spot opens up |
 | **Notify On Join** | On | Notify you when they join a channel while following is paused or manual. Click the notification to join |
+| **Transparency** | 65% | How see-through the panel and tooltip are. 0% makes them solid. The panel's ◐ button sets the same value |
 
-<img src="images/settings.png" alt="Follow User settings" width="675">
+<img src="images/settings.png" alt="Follow User settings" width="679">
 
 ## Installation
 
