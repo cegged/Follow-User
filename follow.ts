@@ -6,7 +6,7 @@
  */
 
 import { showNotification } from "@api/Notifications";
-import type { Channel } from "@vencord/discord-types";
+import type { Channel, User } from "@vencord/discord-types";
 import { findByPropsLazy } from "@webpack";
 import {
     ChannelStore,
@@ -26,9 +26,24 @@ const ChannelActions: {
     selectVoiceChannel: (channelId: string) => void;
 } = findByPropsLazy("disconnect", "selectVoiceChannel");
 
-export function getDisplayName(userId: string) {
-    const user = UserStore.getUser(userId);
+const AUTO_JOIN_LIMIT = 5;
+const AUTO_JOIN_WINDOW = 30_000;
+const autoJoins: number[] = [];
+
+const NOTIFY_COOLDOWN = 60_000;
+const notifiedAt = new Map<string, number>();
+
+function resetHistory() {
+    autoJoins.length = 0;
+    notifiedAt.clear();
+}
+
+export function nameOf(user?: User | null) {
     return user?.globalName || user?.username || "user";
+}
+
+export function getDisplayName(userId: string) {
+    return nameOf(UserStore.getUser(userId));
 }
 
 export function getChannelId(userId: string) {
@@ -63,42 +78,63 @@ export function isUserLimited(channel: Channel) {
 }
 
 export function triggerFollow(userChannelId: string | null = getChannelId(settings.store.followUserId)) {
-    if (!settings.store.followUserId) return;
+    const { followUserId } = settings.store;
+    if (!followUserId) return false;
 
+    const name = getDisplayName(followUserId);
     const myChannelId = SelectedChannelStore.getVoiceChannelId();
 
     if (!userChannelId) {
         if (!myChannelId) {
-            showToast({ text: "User not in voice (or in a server you're not in)", variant: "critical" });
+            showToast({ text: `${name} isn't in a voice channel you can see`, variant: "critical" });
         } else if (settings.store.followLeave) {
             ChannelActions.disconnect();
-            showToast({ text: "Followed user left, disconnected", variant: "success" });
+            showToast({ text: `${name} left voice, so you left too`, variant: "success" });
         } else {
-            showToast({ text: "Followed user left, but not following disconnect", variant: "critical" });
+            showToast({ text: `${name} left voice` });
         }
-        return;
+        return false;
     }
 
     if (userChannelId === myChannelId) {
-        showToast({ text: "You are already in the same channel", variant: "critical" });
-        return;
+        showToast({ text: `You're already with ${name}` });
+        return false;
     }
 
     const channel = ChannelStore.getChannel(userChannelId);
-    if (!channel) return;
+    if (!channel) return false;
 
     if (!channel.isPrivate() && !PermissionStore.can(PermissionsBits.CONNECT, channel)) {
-        showToast({ text: "Insufficient permissions to enter in the voice channel", variant: "critical" });
-        return;
+        showToast({ text: `You don't have permission to join ${name}'s channel`, variant: "critical" });
+        return false;
     }
 
     if (isUserLimited(channel) && getMemberCount(userChannelId) >= channel.userLimit) {
-        showToast({ text: "Channel is full", variant: "critical" });
-        return;
+        const waits = settings.store.channelFull && !settings.store.onlyManualTrigger;
+        showToast({ text: `${name}'s channel is full${waits ? ". You'll join when a spot opens" : ""}`, variant: "critical" });
+        return false;
     }
 
     ChannelActions.selectVoiceChannel(userChannelId);
-    showToast({ text: "Followed user into a new voice channel", variant: "success" });
+    showToast({ text: `Joined ${name} in ${channel.isPrivate() ? "a private call" : channel.name}`, variant: "success" });
+    return true;
+}
+
+export function autoFollow(userChannelId?: string | null) {
+    const now = Date.now();
+    while (autoJoins.length && now - autoJoins[0] > AUTO_JOIN_WINDOW) autoJoins.shift();
+
+    if (autoJoins.length >= AUTO_JOIN_LIMIT) {
+        autoJoins.length = 0;
+        settings.store.paused = true;
+        showToast({
+            text: `Paused following ${getDisplayName(settings.store.followUserId)}: you were moved too often. Click their picture to resume`,
+            variant: "critical"
+        });
+        return;
+    }
+
+    if (triggerFollow(userChannelId)) autoJoins.push(now);
 }
 
 export function setPaused(paused: boolean) {
@@ -117,6 +153,11 @@ export function notifyJoined(channelId: string) {
     const { followUserId } = settings.store;
     if (!settings.store.notifyOnJoin || channelId === SelectedChannelStore.getVoiceChannelId()) return;
 
+    const now = Date.now();
+    for (const [id, at] of notifiedAt) if (now - at > NOTIFY_COOLDOWN) notifiedAt.delete(id);
+    if (notifiedAt.has(channelId)) return;
+    notifiedAt.set(channelId, now);
+
     showNotification({
         title: "Follow User",
         body: `${getDisplayName(followUserId)} joined ${getVoiceLocation(followUserId) ?? "a voice channel"}. Click to join.`,
@@ -126,6 +167,7 @@ export function notifyJoined(channelId: string) {
 }
 
 function follow(userId: string) {
+    resetHistory();
     settings.store.followUserId = userId;
     settings.store.paused = false;
     showToast({ text: `Now following ${getDisplayName(userId)}`, variant: "success" });
@@ -140,6 +182,7 @@ export function unfollow() {
     const { followUserId } = settings.store;
     if (!followUserId) return;
 
+    resetHistory();
     settings.store.followUserId = "";
     settings.store.paused = false;
     showToast({ text: `Stopped following ${getDisplayName(followUserId)}` });

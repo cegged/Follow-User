@@ -134,7 +134,7 @@
 }
 
 .vc-follow-user-badge {
-    --vc-follow-user-bead: rgb(0 0 0 / 42%);
+    --vc-follow-user-bead: rgb(0 0 0 / 55%);
 
     position: absolute;
     right: -4px;
@@ -152,8 +152,6 @@
     background-clip: padding-box;
     box-shadow: inset 0 -1px 1px rgb(0 0 0 / 18%);
     color: var(--white, #fff);
-    -webkit-backdrop-filter: blur(3px) saturate(1.6) brightness(0.8);
-    backdrop-filter: blur(3px) saturate(1.6) brightness(0.8);
     transition: background-color 0.2s ease-out;
 }
 
@@ -300,12 +298,15 @@
 }
 
 .vc-follow-user-reset {
-    padding: 0;
+    margin: -4px -8px;
+    padding: 4px 8px;
     border: none;
+    border-radius: 999px;
     background: none;
     color: var(--text-link);
     font-size: 12px;
     font-weight: 600;
+    line-height: 16px;
     cursor: pointer;
 }
 
@@ -546,10 +547,7 @@
     }
 
     .vc-follow-user-badge {
-        --vc-follow-user-bead: var(--background-mod-strong);
-
-        -webkit-backdrop-filter: none;
-        backdrop-filter: none;
+        --vc-follow-user-bead: rgb(42 42 48);
     }
 
     .vc-follow-user-badge.vc-follow-user-badge-active {

@@ -28,7 +28,7 @@ import {
 } from "@webpack/common";
 import type { ComponentType, CSSProperties, KeyboardEvent } from "react";
 
-import { getDisplayName, getVoiceLocation, isTogether, joinNow, setPaused, unfollow } from "./follow";
+import { getVoiceLocation, isTogether, joinNow, nameOf, setPaused, unfollow } from "./follow";
 import { FollowIcon, JoinIcon, PauseIcon, ResumeIcon, TransparencyIcon, UnfollowIcon } from "./icons";
 import { AUTHOR, DEFAULT_TRANSPARENCY, settings } from "./settings";
 
@@ -48,19 +48,19 @@ export function glassProps(transparency: number, className: string) {
     };
 }
 
-function useAuthor() {
-    const cached = useStateFromStores([UserStore], () => UserStore.getUser(AUTHOR_ID));
+export function useUser(userId: string) {
+    const cached = useStateFromStores([UserStore], () => UserStore.getUser(userId));
     const [fetched, setFetched] = useState<User | null>(null);
 
     useEffect(() => {
-        if (cached) return;
+        if (cached || !userId) return;
 
         let mounted = true;
-        UserUtils.getUser(AUTHOR_ID).then(user => mounted && setFetched(user), () => { });
+        UserUtils.getUser(userId).then(user => mounted && setFetched(user), () => { });
         return () => { mounted = false; };
-    }, [cached]);
+    }, [cached, userId]);
 
-    return cached ?? fetched;
+    return cached ?? (fetched?.id === userId ? fetched : null);
 }
 
 function openAuthorProfile() {
@@ -154,10 +154,10 @@ function TransparencyControl({ value, onChange }: { value: number; onChange(valu
 
 export function FollowPanel({ onClose }: FollowPanelProps) {
     const { followUserId, paused } = settings.use(["followUserId", "paused"]);
-    const user = useStateFromStores([UserStore], () => UserStore.getUser(followUserId));
+    const user = useUser(followUserId);
     const location = useStateFromStores([VoiceStateStore, ChannelStore, GuildStore], () => getVoiceLocation(followUserId));
     const together = useStateFromStores([VoiceStateStore, SelectedChannelStore], () => isTogether(followUserId));
-    const author = useAuthor();
+    const author = useUser(AUTHOR_ID);
     const [transparency, setTransparency] = useState(() => Math.round(settings.store.transparency));
     const [showTransparency, setShowTransparency] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
@@ -192,7 +192,7 @@ export function FollowPanel({ onClose }: FollowPanelProps) {
                     ? <img className={cl("panel-avatar")} src={user.getAvatarURL(undefined, 80)} alt="" />
                     : <div className={cl("panel-avatar")}><FollowIcon following /></div>}
                 <div className={cl("panel-identity")}>
-                    <div className={cl("panel-name")}>{getDisplayName(followUserId)}</div>
+                    <div className={cl("panel-name")}>{nameOf(user)}</div>
                     <div className={cl("panel-status")} title={status}>{status}</div>
                 </div>
                 <button
@@ -212,7 +212,7 @@ export function FollowPanel({ onClose }: FollowPanelProps) {
             {showTransparency && <TransparencyControl value={transparency} onChange={changeTransparency} />}
 
             <div className={cl("actions")} role="group">
-                {!together && <PanelAction icon={JoinIcon} label="Join Now" onClick={run(joinNow)} />}
+                {location && !together && <PanelAction icon={JoinIcon} label="Join Now" onClick={run(joinNow)} />}
                 <PanelAction
                     icon={paused ? ResumeIcon : PauseIcon}
                     label={paused ? "Resume Following" : "Pause Following"}

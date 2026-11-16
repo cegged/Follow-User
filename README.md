@@ -59,7 +59,7 @@ Right-click the indicator to open its panel. At the top you see who you follow a
 
 | Option | What it does |
 |---|---|
-| **Join Now** | Joins their channel right now (only shown when you are not together) |
+| **Join Now** | Joins their channel right now (only shown when they are in a voice channel you can see and you are not with them) |
 | **Pause / Resume Following** | Stops following for a while, without forgetting the user |
 | **Unfollow** | Stops following and removes the indicator |
 | **Settings** | Opens the plugin settings |

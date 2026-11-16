@@ -17,7 +17,7 @@ import definePlugin from "@utils/types";
 import type { User, VoiceState } from "@vencord/discord-types";
 import { ChannelStore, Menu, SelectedChannelStore, UserStore } from "@webpack/common";
 
-import { getChannelId, getMemberCount, isUserLimited, notifyJoined, setPaused, toggleFollow, triggerFollow } from "./follow";
+import { autoFollow, getChannelId, getMemberCount, isUserLimited, notifyJoined, setPaused, toggleFollow } from "./follow";
 import { FollowIndicator } from "./FollowIndicator";
 import { FollowIcon, FollowingIcon } from "./icons";
 import { AUTHOR, settings } from "./settings";
@@ -103,7 +103,7 @@ export default definePlugin({
                 }
 
                 if (settings.store.autoMoveBack && isMe && channelId && oldChannelId) {
-                    triggerFollow();
+                    if (channelId !== getChannelId(followUserId)) autoFollow();
                     continue;
                 }
 
@@ -112,7 +112,7 @@ export default definePlugin({
                     const justFreedUp = channel && isUserLimited(channel) && getMemberCount(oldChannelId) === channel.userLimit - 1;
 
                     if (justFreedUp && getChannelId(followUserId) === oldChannelId) {
-                        triggerFollow(oldChannelId);
+                        autoFollow(oldChannelId);
                         continue;
                     }
                 }
@@ -120,9 +120,9 @@ export default definePlugin({
                 if (userId !== followUserId) continue;
 
                 if (channelId) {
-                    triggerFollow(channelId);
+                    autoFollow(channelId);
                 } else if (oldChannelId) {
-                    triggerFollow(null);
+                    autoFollow(null);
                 }
             }
         },
