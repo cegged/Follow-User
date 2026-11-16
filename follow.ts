@@ -49,7 +49,6 @@ export function getVoiceLocation(userId: string) {
     return guild ? `${channel.name} (${guild.name})` : channel.name;
 }
 
-// Whether you are in the same voice channel as the user
 export function isTogether(userId: string) {
     const channelId = getChannelId(userId);
     return channelId != null && channelId === SelectedChannelStore.getVoiceChannelId();

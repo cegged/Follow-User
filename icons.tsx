@@ -49,7 +49,6 @@ export const PauseIcon = makeWalkerIcon("M14 7h2.6v10H14zM18.9 7h2.6v10h-2.6z");
 export const ResumeIcon = makeWalkerIcon("M14 6.5v11l8.5-5.5z");
 export const UnfollowIcon = makeWalkerIcon("M21.9 8.5 20.5 7.1 18 9.6l-2.5-2.5-1.4 1.4 2.5 2.5-2.5 2.5 1.4 1.4 2.5-2.5 2.5 2.5 1.4-1.4-2.5-2.5z");
 
-// A circle, half filled: how see-through the glass is
 export function TransparencyIcon({ className, height = 24, width = 24 }: IconProps) {
     return (
         <svg className={className} width={width} height={height} viewBox="0 0 24 24" aria-hidden="true">
@@ -59,7 +58,6 @@ export function TransparencyIcon({ className, height = 24, width = 24 }: IconPro
     );
 }
 
-// Two bars, the sign on the indicator's badge while following is paused
 export function PauseBarsIcon({ className, height = 24, width = 24 }: IconProps) {
     return (
         <svg className={className} width={width} height={height} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

@@ -37,12 +37,10 @@ export const cl = classNameFactory("vc-follow-user-");
 const AUTHOR_ID = AUTHOR.id.toString();
 const TRANSPARENCY_ID = "vc-follow-user-transparency";
 
-// Every change to a setting rewrites Vencord's settings file, so a dragged slider saves once it settles
 const saveTransparency = debounce((value: number) => {
     settings.store.transparency = value;
 }, 200);
 
-// The glass gets thinner as transparency goes up: solid at 0%, a fifth of the glass left at 100%
 export function glassProps(transparency: number, className: string) {
     return {
         className: classes(cl("glass", { solid: transparency === 0 }), className),
@@ -50,7 +48,6 @@ export function glassProps(transparency: number, className: string) {
     };
 }
 
-// The author's Discord account, fetched once if this Discord app hasn't seen it yet
 function useAuthor() {
     const cached = useStateFromStores([UserStore], () => UserStore.getUser(AUTHOR_ID));
     const [fetched, setFetched] = useState<User | null>(null);
@@ -70,7 +67,6 @@ function openAuthorProfile() {
     openUserProfile(AUTHOR_ID).catch(() => showToast({ text: "Couldn't open the profile", variant: "critical" }));
 }
 
-// Where they are and whether following is paused, e.g. "Paused · In General (My Server)"
 function describeStatus(location: string | null, paused: boolean, together: boolean) {
     const where = !location
         ? "Not in a voice channel you can see"
@@ -80,11 +76,9 @@ function describeStatus(location: string | null, paused: boolean, together: bool
 }
 
 interface FollowPanelProps {
-    // restoreFocus puts the keyboard back on the indicator, for a panel closed with Escape
     onClose(restoreFocus?: boolean): void;
 }
 
-// Escape closes the panel. The arrow keys, Home and End move between its buttons, like in a menu
 function handleKeys(e: KeyboardEvent<HTMLDivElement>, onClose: FollowPanelProps["onClose"]) {
     if (e.key === "Escape") {
         e.preventDefault();
@@ -93,7 +87,6 @@ function handleKeys(e: KeyboardEvent<HTMLDivElement>, onClose: FollowPanelProps[
         return;
     }
 
-    // The slider uses the arrow keys itself
     if (e.target instanceof HTMLInputElement) return;
 
     const items = [...e.currentTarget.querySelectorAll<HTMLElement>("[data-vc-follow-user-nav]")];
@@ -127,7 +120,6 @@ function PanelAction({ icon: Icon, label, danger, onClick }: PanelActionProps) {
     );
 }
 
-// Changes the panel live while the slider moves. Reset only shows once the value is off the default
 function TransparencyControl({ value, onChange }: { value: number; onChange(value: number): void; }) {
     return (
         <div id={TRANSPARENCY_ID} className={cl("transparency")}>
@@ -160,19 +152,16 @@ function TransparencyControl({ value, onChange }: { value: number; onChange(valu
     );
 }
 
-// The panel that opens on right-click: who you follow and where they are, then what you can do
 export function FollowPanel({ onClose }: FollowPanelProps) {
     const { followUserId, paused } = settings.use(["followUserId", "paused"]);
     const user = useStateFromStores([UserStore], () => UserStore.getUser(followUserId));
     const location = useStateFromStores([VoiceStateStore, ChannelStore, GuildStore], () => getVoiceLocation(followUserId));
     const together = useStateFromStores([VoiceStateStore, SelectedChannelStore], () => isTogether(followUserId));
     const author = useAuthor();
-    // The settings page's slider can save fractions, so the panel's own slider starts from a whole number
     const [transparency, setTransparency] = useState(() => Math.round(settings.store.transparency));
     const [showTransparency, setShowTransparency] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
 
-    // The panel takes the keyboard when it opens, the way a menu does
     useEffect(() => {
         panelRef.current?.focus({ preventScroll: true });
     }, []);
@@ -182,7 +171,6 @@ export function FollowPanel({ onClose }: FollowPanelProps) {
         saveTransparency(value);
     };
 
-    // Every action closes the panel first, like choosing an item in a menu
     const run = (action: () => unknown) => () => {
         onClose();
         action();

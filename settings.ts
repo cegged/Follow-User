@@ -8,10 +8,8 @@
 import { definePluginSettings } from "@api/Settings";
 import { OptionType } from "@utils/types";
 
-// Credited in Vencord's plugin list and at the bottom of the indicator's panel
 export const AUTHOR = { name: "cegged", id: 453743721402466317n };
 
-// See-through enough that what's behind the glass shows, while the text on it stays clear
 export const DEFAULT_TRANSPARENCY = 65;
 
 export const settings = definePluginSettings({

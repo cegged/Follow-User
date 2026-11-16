@@ -4,14 +4,6 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-/*
- * Liquid Glass: the panel and the tooltip float over Discord, the one layer glass belongs to.
- * The glass takes Discord's own surface color, so every Discord theme tints it. Nothing behind a
- * menu needs reading, so a strong blur turns it into soft color instead of ghost letters, and
- * dimming it keeps the text on the glass clear. What sits on the glass stays plain: translucent
- * fills, never glass of its own.
- */
-
 .vc-follow-user-glass {
     --vc-follow-user-glass: color-mix(
         in oklab,
@@ -19,7 +11,6 @@
         transparent
     );
     --vc-follow-user-backdrop: blur(14px) saturate(1.5) brightness(0.6);
-    /* Discord's muted text is tuned for its solid surfaces; on glass it gets brighter */
     --vc-follow-user-secondary: color-mix(in oklab, var(--text-muted), var(--text-default) 75%);
     --vc-follow-user-accent: var(--control-primary-background-default, var(--brand-500));
     --vc-follow-user-sheen: rgb(255 255 255 / 12%);
@@ -37,7 +28,6 @@
     color: var(--text-default);
 }
 
-/* The light-catching rim: bright where light falls on the top edge, faint along the sides */
 .vc-follow-user-glass::before {
     position: absolute;
     inset: 0;
@@ -73,13 +63,10 @@
         0 3px 10px rgb(0 0 0 / 9%);
 }
 
-/* At 0% transparency the glass is solid, so nothing behind it needs blurring */
 .vc-follow-user-solid {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
 }
-
-/* Indicator: the followed user's avatar at the top of the server list */
 
 .vc-follow-user-container {
     display: flex;
@@ -102,7 +89,6 @@
     transform: scale(0.94);
 }
 
-/* A ring around the avatar: white while its panel is open, Discord's focus color for the keyboard */
 .vc-follow-user-indicator::before {
     position: absolute;
     inset: -4px;
@@ -147,11 +133,6 @@
     opacity: 0.5;
 }
 
-/*
- * The status bead: a drop of glass in the avatar's corner, cut out of the server list like Discord's
- * status dots. Smoky glass by default, green glass while you follow someone who is in voice. The
- * symbol on it says the same thing for anyone who can't tell the colors apart.
- */
 .vc-follow-user-badge {
     --vc-follow-user-bead: rgb(0 0 0 / 42%);
 
@@ -180,11 +161,6 @@
     --vc-follow-user-bead: color-mix(in oklab, var(--status-positive, #23a55a) 85%, transparent);
 }
 
-/*
- * Panel: opens on right-click next to the indicator. Its corners are concentric: each row's radius
- * is the panel's minus the panel's padding, so the curves run parallel.
- */
-
 .vc-follow-user-panel {
     display: flex;
     flex-direction: column;
@@ -195,12 +171,10 @@
     border-radius: 22px;
     font-size: 14px;
     line-height: 18px;
-    /* It grows out of the indicator, which sits at the middle of its left edge */
     transform-origin: left center;
     animation: vc-follow-user-panel-in 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* The panel itself only takes focus to hear the keyboard */
 .vc-follow-user-panel:focus {
     outline: none;
 }
@@ -246,7 +220,6 @@
     white-space: nowrap;
 }
 
-/* Long channel and server names wrap to a second line, then end in an ellipsis */
 .vc-follow-user-panel-status {
     display: -webkit-box;
     margin-top: 1px;
@@ -258,7 +231,6 @@
     -webkit-line-clamp: 2;
 }
 
-/* The transparency button. While its slider is open it shows the accent in its symbol */
 .vc-follow-user-icon-button {
     display: flex;
     flex-shrink: 0;
@@ -291,8 +263,6 @@
     background: var(--background-mod-normal);
     color: var(--vc-follow-user-accent);
 }
-
-/* Transparency: a well under the header that opens from the button */
 
 .vc-follow-user-transparency {
     display: flex;
@@ -343,12 +313,10 @@
     text-decoration: underline;
 }
 
-/* Keeps its place while hidden, so the slider doesn't jump when it appears */
 .vc-follow-user-reset-hidden {
     visibility: hidden;
 }
 
-/* The slider: a white capsule thumb that turns into a lens of glass while you drag it */
 .vc-follow-user-range {
     flex: 1;
     min-width: 0;
@@ -405,8 +373,6 @@
         0 6px 14px rgb(0 0 0 / 28%);
     transform: scale(1.45);
 }
-
-/* Actions: rows like menu items, with the one that stops following in red and last */
 
 .vc-follow-user-actions {
     display: flex;
@@ -470,8 +436,6 @@
     background: var(--background-mod-normal);
 }
 
-/* Footer: the plugin's settings, and the author's credit as a button to their profile */
-
 .vc-follow-user-footer {
     display: flex;
     align-items: center;
@@ -534,8 +498,6 @@
     white-space: nowrap;
 }
 
-/* Tooltip: Discord's tooltip only places the glass card. Its own fill, border and arrow step aside */
-
 .vc-follow-user-tooltip {
     max-width: none !important;
     padding: 0 !important;
@@ -574,11 +536,6 @@
     font-size: 12px;
     line-height: 16px;
 }
-
-/*
- * Accessibility: no see-through glass, stronger edges and text, no moving parts when the system asks.
- * The doubled classes outrank the light theme's rules above.
- */
 
 @media (prefers-reduced-transparency: reduce) {
     .vc-follow-user-glass.vc-follow-user-glass {

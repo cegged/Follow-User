@@ -23,13 +23,10 @@ import { cl, FollowPanel, glassProps } from "./FollowPanel";
 import { FollowIcon, PauseBarsIcon } from "./icons";
 import { settings } from "./settings";
 
-// A crash inside the panel shows Vencord's error card there instead of taking the indicator down
 const SafeFollowPanel = ErrorBoundary.wrap(FollowPanel, { noop: false });
 
 type BadgeState = "active" | "idle" | "paused";
 
-// The status bead in the avatar's corner: green glass while you follow someone who is in voice,
-// smoky glass while they aren't, and a pause sign while following is paused
 function StatusBadge({ state }: { state: BadgeState; }) {
     return (
         <div className={cl("badge", { "badge-active": state === "active" })}>
@@ -57,7 +54,6 @@ function FollowTooltip({ name, paused, location, transparency }: FollowTooltipPr
     );
 }
 
-// The followed user's avatar at the top of the server list. Click joins them, right-click opens the panel
 export function FollowIndicator() {
     const { followUserId, paused, transparency } = settings.use(["followUserId", "paused", "transparency"]);
     const user = useStateFromStores([UserStore], () => UserStore.getUser(followUserId));
